@@ -332,30 +332,32 @@ __detect(){
   fi
 
   if [ "$status" -eq "-1" ]; then     ## When unsafe processing is not allowed, the -1 signifies
-    printf '%b %s not understood\n' "${fail}" "${command}" > "$OUTPUT"
+    printf '%b %s not understood\n' "${fail}" "${command}" > "$ERROR_OUTPUT"
     KO=$(( KO+1 ))
 
   elif [ ${status} -eq 127 ]; then    ## command not installed
-    printf '%b %s\n' "${fail}" "${command}" > "$OUTPUT"
+    printf '%b %s\n' "${fail}" "${command}" > "$ERROR_OUTPUT"
     KO=$(( KO+1 ))
 
   elif [ ${status} -eq 0 ] || [ ${status} -eq 141 ]; then      ## successfully executed
-    printf "%b %s %b\n" "${pass}" "${command}" "${wrapper_beg}${version}${wrapper_end}" > "$OUTPUT"
+    printf "%b %s %b\n" "${pass}" "${command}" "${wrapper_beg}${version}${wrapper_end}" > "$SUCCESS_OUTPUT"
     OK=$(( OK+1 ))
 
   else  ## as long as its not 127, command is there, but we might not have been able to extract version
-    printf '%b %s\n' "${pass}" "${command}" > "$OUTPUT"
+    printf '%b %s\n' "${pass}" "${command}" > "$SUCCESS_OUTPUT"
     OK=$(( OK+1 ))
   fi
 } #end __detect
 
 OPTIND=1
-OUTPUT=/dev/stdout
+SUCCESS_OUTPUT=/dev/stdout
+ERROR_OUTPUT=/dev/stderr
 
 while getopts ":qhv-" OPTION; do
   case "$OPTION" in
   q)
-    OUTPUT=/dev/null
+    SUCCESS_OUTPUT=/dev/null
+    ERROR_OUTPUT=/dev/null
     ;;
   h)
     _print_usage
