@@ -57,7 +57,7 @@ fi
 Just run the following: 
 
 ```bash
-brew install kdabir/tap/has
+brew install has
 ```
 
 ### Cloning the Repo

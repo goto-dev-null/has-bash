@@ -65,6 +65,22 @@ uninstall-all: uninstall uninstall-completions
 
 .PHONY: test install install-completions install-all uninstall uninstall-completions uninstall-all update
 
+# bump VERSION in 'has', commit, tag and push. Triggers .github/workflows/release.yml
+release:
+	@if [ -n "$$(git status --porcelain)" ]; then \
+		echo "Working tree is not clean. Commit or stash changes first."; exit 1; \
+	fi
+	@read -p "New version (vX.Y.Z): " version; \
+	if ! echo "$$version" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+$$'; then \
+		echo "Version must look like vX.Y.Z"; exit 1; \
+	fi; \
+	sed -i.bak "s/^readonly VERSION=.*/readonly VERSION=\"$$version\"/" has && rm has.bak; \
+	git commit -am "release $$version"; \
+	git tag "$$version"; \
+	git push origin HEAD "$$version"
+
+.PHONY: release
+
 CONTAINERS = ubuntu alpine
 
 .PHONY: docker-test
